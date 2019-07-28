@@ -31,7 +31,7 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent" android:orientation="vertical"
-            android:layout_height="match_parent" android:layout_gravity="center">
+            android:layout_height="match_parent" >
 
         <TextView android:gravity="center"
             android:layout_marginTop="10sp"
@@ -99,7 +99,18 @@
             app:spinning_bar_color="@color/white"
             app:spinning_bar_padding="6dp" />
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        <View android:layout_weight="1"
+              android:layout_width="match_parent"
+              android:background="@android:color/transparent"
+              android:layout_height="0dp"/>
 
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:adSize="BANNER"
+            app:adUnitId="ca-app-pub-3940256099942544/6300978111"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </FrameLayout>

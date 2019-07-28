@@ -15,6 +15,8 @@ import br.com.simplepass.loadingbutton.customViews.CircularProgressButton
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.reward.RewardItem
 import com.google.android.gms.ads.reward.RewardedVideoAd
@@ -47,6 +49,8 @@ class BOTFragment : Fragment(), RewardedVideoAdListener {
         }else{
             setFirebaseListener()
         }
+
+
     }
 
     private fun setFirebaseListener(){
@@ -80,6 +84,9 @@ class BOTFragment : Fragment(), RewardedVideoAdListener {
                 startService()
             }
         }
+
+        val mAdView = view.findViewById<AdView>(R.id.adView)
+        mAdView.loadAd(AdRequest.Builder().build())
 
         context?.let {
             Glide.with(it)
