@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "24115778083",
+    "firebase_url": "https://confetibot-f9e19.firebaseio.com",
+    "project_id": "confetibot-f9e19",
+    "storage_bucket": "confetibot-f9e19.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24115778083:android:bed34eb79331a09d",
+        "android_client_info": {
+          "package_name": "com.apps.confettibot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "24115778083-8tngs178ts42jdlp43ucl0eshjuj0n2e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.apps.confettibot",
+            "certificate_hash": "ddb14eaec47085d763a51b988440704774677f3f"
+          }
+        },
+        {
+          "client_id": "24115778083-4ib15rm22caahqq3k6mk7uh0og7s7pml.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRTaDHiUzG2HjcvepcG_I5nD0IJV1bQjE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "24115778083-4ib15rm22caahqq3k6mk7uh0og7s7pml.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

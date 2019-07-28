@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             tools:context=".BOTFragment"
+             android:id="@+id/rootBOTFragment">
+
+    <com.github.glomadrian.grav.GravView android:id="@+id/grav"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:pointGenerator="com.github.glomadrian.grav.generator.point.RegularPointGenerator"
+            app:array_colors="@array/colores"
+            app:animationGenerator="com.github.glomadrian.grav.generator.animation.SideToSideAnimator"
+            app:gravGenerator="com.github.glomadrian.grav.generator.grav.BallGenerator"
+            app:side_to_side_direction="upToDown"
+            app:regular_cell_size="150"
+            app:regular_variance="100"
+            app:shake_min_duration="1000"
+            app:shake_max_duration="3000"
+            app:shake_direction="vertical"
+            app:path_variance_from="-10dp"
+            app:path_variance_to="12dp"
+            app:path_min_duration="5000"
+            app:path_max_duration="6000"
+            app:ball_size_min_duration="1000"
+            app:ball_size_max_duration="3000"
+            app:ball_size_from_size="3dp"
+            app:ball_size_to_size="8dp"/>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent" android:orientation="vertical"
+            android:layout_height="match_parent" android:layout_gravity="center">
+
+        <TextView android:gravity="center"
+            android:layout_marginTop="10sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold"
+            android:textSize="26sp"
+            android:text="CONFETTI AYUDIN MEXICO" />
+
+        <LinearLayout android:orientation="horizontal"
+                android:layout_width="match_parent" android:layout_height="wrap_content">
+
+            <ImageView android:layout_weight="1" android:id="@+id/confettiImage"
+                    android:paddingTop="15sp"
+                    android:paddingBottom="15sp"
+                    android:contentDescription="Confetti Image"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"/>
+
+            <ImageView android:layout_weight="1" android:id="@+id/mxImage"
+                    android:contentDescription="Mexico Image"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"/>
+
+        </LinearLayout>
+
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+
+            <Button  android:id="@+id/GO"
+                    android:text="INICIAR AYUDIN"
+                    android:layout_gravity="center"
+                    android:alpha="0.3"
+                    android:layout_margin="10dp"
+                    android:padding="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/custombtn"/>
+
+            <Button android:id="@+id/lock" android:text="Reproduce anuncio para desbloquear"
+                 android:textColor="@color/blue"
+                 android:gravity="center"
+                 android:drawablePadding="5dp"
+                 android:textSize="18sp"
+                 android:drawableBottom="@drawable/lock"
+                 android:alpha="0.6"
+                 android:layout_width="match_parent" android:layout_height="match_parent"/>
+
+        </FrameLayout>
+
+        <br.com.simplepass.loadingbutton.customViews.CircularProgressButton
+            android:drawableStart="@drawable/play" android:text="Reproducir anuncio"
+            android:elevation="4dp"
+            android:drawablePadding="10dp"
+            android:padding="10dp" android:layout_margin="10dp"
+            android:textColor="@color/white"
+            android:layout_gravity="end"
+            android:id="@+id/adBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custombtn"
+            app:spinning_bar_width="4dp"
+            app:spinning_bar_color="@color/white"
+            app:spinning_bar_padding="6dp" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+</FrameLayout>

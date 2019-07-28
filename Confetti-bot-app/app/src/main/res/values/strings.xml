@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Confetti ayudin</string>
+    <string name="tab_text_1">AYUDIN</string>
+    <string name="tab_text_2">INFO</string>
+
+    <string name="sample_Question">¿Quien descubrio a la mokito? </string>
+    <string name="modo_juego">Al iniciar la ayuda, una grafica se colocara sobre las demas apps permitiendote jugar confetti y al mismo tiempo analizar en tiempo real la posible respuesta que nuestro algoritmo genera.</string>
+    <string name="limitantes">Ten en cuenta que la ayuda tiene un porcentaje base aproximado del 70% de aciertos, en algunos casos puede aumentar o disminuir. Recuerda que al final tú eres el que decide que responder.</string>
+    <string name="terms">
+        ESTE SOFTWARE ES PROPORCIONADO TAL CUAL, SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O IMPLÍCITA. Usalo bajo tu propio riesgo. \nel autor no está afiliado a conffeti mexico o facebook inc.
+    </string>
+</resources>
