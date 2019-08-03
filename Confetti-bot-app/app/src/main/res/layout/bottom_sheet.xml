@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:id="@+id/bottom_sheet"
+              android:layout_width="match_parent"
+              android:layout_height="340dp"
+              android:background="@android:color/darker_gray"
+              android:orientation="vertical"
+              app:behavior_hideable="true"
+              app:behavior_peekHeight="150dp"
+              app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <WebView android:id="@+id/webView"
+            android:layout_width="match_parent" android:layout_height="match_parent">
+
+    </WebView>
+
+</LinearLayout>
