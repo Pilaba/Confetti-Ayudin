@@ -37,7 +37,7 @@
             android:layout_marginTop="10sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/colorPrimary"
             android:textStyle="bold"
             android:textSize="26sp"
             android:text="CONFETTI AYUDIN MEXICO" />
@@ -74,7 +74,7 @@
                     android:background="@drawable/custombtn"/>
 
             <Button android:id="@+id/lock" android:text="Reproduce anuncio para desbloquear"
-                 android:textColor="@color/blue"
+                 android:textColor="@color/colorPrimary"
                  android:gravity="center"
                  android:drawablePadding="5dp"
                  android:textSize="18sp"
@@ -108,7 +108,7 @@
             android:id="@+id/adView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:adSize="BANNER"
+            app:adSize="SMART_BANNER"
             app:adUnitId="ca-app-pub-3940256099942544/6300978111"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>

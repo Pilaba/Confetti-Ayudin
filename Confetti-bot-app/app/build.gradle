@@ -7,7 +7,7 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.apps.confettibot"
+        applicationId "com.ayudin.confetti"
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 1
@@ -40,6 +40,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:17.0.0'
     implementation 'com.google.firebase:firebase-functions:17.0.0'
     implementation 'com.google.firebase:firebase-database:18.0.0'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
     implementation 'com.github.nkzawa:socket.io-client:0.6.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0-alpha'
@@ -52,3 +53,4 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'

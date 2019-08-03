@@ -8,17 +8,25 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:24115778083:android:bed34eb79331a09d",
+        "mobilesdk_app_id": "1:24115778083:android:3e4609036524f5ef",
         "android_client_info": {
-          "package_name": "com.apps.confettibot"
+          "package_name": "com.ayudin.confetti"
         }
       },
       "oauth_client": [
         {
-          "client_id": "24115778083-8tngs178ts42jdlp43ucl0eshjuj0n2e.apps.googleusercontent.com",
+          "client_id": "24115778083-lldj9qnr1bi947qi0ptkccruralmj83g.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.apps.confettibot",
+            "package_name": "com.ayudin.confetti",
+            "certificate_hash": "177e3ec1a7733095fe4da797addd459c926f6925"
+          }
+        },
+        {
+          "client_id": "24115778083-v659s566iudi6e7easdfnjme6t9l0bad.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ayudin.confetti",
             "certificate_hash": "ddb14eaec47085d763a51b988440704774677f3f"
           }
         },
@@ -41,7 +49,8 @@
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-5846226462716541~1162981272"
     }
   ],
   "configuration_version": "1"

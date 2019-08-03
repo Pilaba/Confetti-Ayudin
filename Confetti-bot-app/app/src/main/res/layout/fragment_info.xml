@@ -16,7 +16,7 @@
             <TextView
                     android:text="Modo de juego"
                     android:textSize="16sp"
-                    android:textColor="@color/blue"
+                    android:textColor="@color/colorPrimary"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView6" app:layout_constraintStart_toStartOf="parent"
@@ -36,7 +36,7 @@
             <TextView
                     android:text="Limitantes"
                     android:textSize="16sp"
-                    android:textColor="@color/blue"
+                    android:textColor="@color/colorPrimary"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView8"
@@ -58,7 +58,7 @@
             <TextView
                     android:text="Terminos y condiciones"
                     android:textSize="16sp"
-                    android:textColor="@color/blue"
+                    android:textColor="@color/colorPrimary"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView4"
@@ -79,18 +79,8 @@
                     app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
-                    app:layout_constraintBottom_toTopOf="@+id/frog"
                     app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintTop_toBottomOf="@+id/textView4"/>
-
-            <ImageView android:id="@+id/frog"
-                       android:contentDescription="froggy gif"
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content" tools:src="@tools:sample/avatars[2]"
-                       android:layout_marginBottom="8dp"
-                       app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-                       android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-                       android:layout_marginStart="8dp"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
