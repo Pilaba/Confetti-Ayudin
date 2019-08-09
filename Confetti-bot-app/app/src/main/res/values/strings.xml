@@ -7,4 +7,9 @@
     <string name="modo_juego">Al iniciar la ayuda, una grafica se colocara sobre las demas apps permitiendote jugar confetti y al mismo tiempo analizar en tiempo real la posible respuesta que se genera.</string>
     <string name="limitantes">Ten en cuenta que la ayuda tiene un porcentaje base aproximado del 70% de aciertos, en algunos casos puede aumentar o disminuir. Recuerda que al final tú eres el que decide que responder.</string>
     <string name="terms">Al usar esta aplicación, usted aceptas los siguientes terminos y condiciones </string>
+
+    <string name="SERVER_ON">Online</string>
+    <string name="SERVER_OFF">Offline</string>
+
+    <string name="GOOGLE_HEADER">dsjhhgalkdjgf shkfhgadbjskndbsNAM SNDBNFSMDNFNMFA DSBJFNDMS ABD NMANB SNASFDSFBFNN,VHBF JKNBDHDJN A.BS MJNKFN,BF ASNDBSVHFJANSBDHVFJNAKSJBHMDJA.HBSADJ AKB,JADJS,F,SJDB</string>
 </resources>

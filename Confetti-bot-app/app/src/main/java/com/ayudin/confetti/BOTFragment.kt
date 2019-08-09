@@ -100,7 +100,8 @@ class BOTFragment : Fragment(), RewardedVideoAdListener {
         adButton.setOnClickListener {
             adButton.startAnimation()
             videoAdWatched = false
-            mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917", AdRequest.Builder().build())
+            mRewardedVideoAd.loadAd("ca-app-pub-5846226462716541/1002111433", AdRequest.Builder().build())
+            //mRewardedVideoAd.loadAd("ca-app-pub-3940256099942544/5224354917", AdRequest.Builder().build())
         }
         return view
     }

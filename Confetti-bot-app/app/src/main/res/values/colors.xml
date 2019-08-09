@@ -8,4 +8,10 @@
 
     <color name="tomato">#ff6347</color>
     <color name="grey">#A9A9A9</color>
+
+
+    <color name="FIRST">#0b6623</color>
+    <color name="SECOND">#444444</color>
+    <color name="THIRD">#FF0000</color>
+
 </resources>
