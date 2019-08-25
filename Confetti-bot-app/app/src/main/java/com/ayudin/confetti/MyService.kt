@@ -12,35 +12,34 @@ import android.view.*
 import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.crashlytics.android.Crashlytics
-import com.github.mikephil.charting.charts.HorizontalBarChart
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
 import com.github.nkzawa.socketio.client.IO
 import com.github.nkzawa.socketio.client.Socket
 import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.Exception
-import java.net.URISyntaxException
 import kotlin.math.ceil
 
 class MyService : Service() {
-    lateinit var mSocket : Socket
-    lateinit var handler : Handler
+    lateinit var mSocket     : Socket
+    lateinit var handler     : Handler
+    lateinit var serviceView : View
     val dataGrafica = arrayOf(0,0,0)
+    lateinit var arrayTextoTabla   : Array<TextView>
+    lateinit var arrayValoresTabla : Array<TextView>
+    var colorVerde                 : Int = 0x0B6623
+    var colorGris                  : Int = 0xAAAAAA
 
     override fun onCreate() {
         super.onCreate()
         val channelId = "CHANNEL-01"
         val builder = NotificationCompat.Builder(this, channelId)
             .setContentTitle("AYUDIN").setContentText("ESTOY LISTO")
-            .setOngoing(true).setSmallIcon(R.drawable.green_icon)
+            .setOngoing(true).setSmallIcon(R.drawable.server_on)
             .setWhen(System.currentTimeMillis())
         val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -51,6 +50,9 @@ class MyService : Service() {
         }
         startForeground(1, builder.build())
         handler = Handler(Looper.getMainLooper())
+
+        colorVerde = ContextCompat.getColor(this, R.color.FIRST)
+        colorGris = ContextCompat.getColor(this, android.R.color.darker_gray)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -72,29 +74,45 @@ class MyService : Service() {
         params.gravity = Gravity.TOP
 
         val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val view = inflater.inflate(R.layout.overlay_view, null)
+        serviceView = inflater.inflate(R.layout.overlay_view, null)
 
-        val viewPregunta = view.findViewById<TextView>(R.id.pregunta)
-        val viewChart    = view.findViewById<HorizontalBarChart>(R.id.chart)
-        val viewClose    = view.findViewById<ImageView>(R.id.close)
-        val viewEye      = view.findViewById<ImageView>(R.id.eye)
-        val viewStatus   = view.findViewById<ImageView>(R.id.imageStatus)
-        val serverStatus = view.findViewById<TextView>(R.id.SERVER_STATUS)
-        val viewTabla    = view.findViewById<LinearLayout>(R.id.tabla)
-        val viewGoogleHeader = view.findViewById<WebView>(R.id.googleHeader)
+        val viewPregunta = serviceView.findViewById<TextView>(R.id.pregunta)
+        val viewChart    = serviceView.findViewById<LinearLayout>(R.id.chart)
+        val viewClose    = serviceView.findViewById<ImageView>(R.id.close)
+        val viewEye      = serviceView.findViewById<ImageView>(R.id.eye)
+        val viewStatus   = serviceView.findViewById<ImageView>(R.id.imageStatus)
+        val serverStatus = serviceView.findViewById<TextView>(R.id.SERVER_STATUS)
+        val viewTabla    = serviceView.findViewById<LinearLayout>(R.id.tabla)
+        val viewGoogleHeader = serviceView.findViewById<WebView>(R.id.googleHeader)
 
-        val viewFirstText   = view.findViewById<TextView>(R.id.firstTEXT)
-        val viewFirstValue  = view.findViewById<TextView>(R.id.firstVALUE)
-        val viewSecondText  = view.findViewById<TextView>(R.id.secondTEXT)
-        val viewSecondValue = view.findViewById<TextView>(R.id.secondVALUE)
-        val viewThirdText   = view.findViewById<TextView>(R.id.thirdTEXT)
-        val viewThirdValue  = view.findViewById<TextView>(R.id.thirdVALUE)
+        val viewFirstText   = serviceView.findViewById<TextView>(R.id.firstTEXT)
+        val viewFirstValue  = serviceView.findViewById<TextView>(R.id.firstVALUE)
+        val viewSecondText  = serviceView.findViewById<TextView>(R.id.secondTEXT)
+        val viewSecondValue = serviceView.findViewById<TextView>(R.id.secondVALUE)
+        val viewThirdText   = serviceView.findViewById<TextView>(R.id.thirdTEXT)
+        val viewThirdValue  = serviceView.findViewById<TextView>(R.id.thirdVALUE)
+
+        arrayTextoTabla = arrayOf (viewFirstText, viewSecondText, viewThirdText )
+        arrayValoresTabla = arrayOf ( viewFirstValue, viewSecondValue, viewThirdValue)
+
+        //CHART VALUES PROGRESS BAR
+        val CHARTA = serviceView.findViewById<TextView>(R.id.CHARTA)
+        val CHARTB = serviceView.findViewById<TextView>(R.id.CHARTB)
+        val CHARTC = serviceView.findViewById<TextView>(R.id.CHARTC)
+
+        val PROGRESSA = serviceView.findViewById<ProgressBar>(R.id.PROGRESSA)
+        val PROGRESSB = serviceView.findViewById<ProgressBar>(R.id.PROGRESSB)
+        val PROGRESSC = serviceView.findViewById<ProgressBar>(R.id.PROGRESSC)
 
         //Listener buttons
         viewClose.setOnClickListener {
-            windowManager.removeView(view)
-            stopForeground(true)
-            stopSelf()
+            try{
+                stopForeground(true)
+                stopSelf()
+                windowManager.removeView(serviceView)
+            }catch(ex: Exception){
+                Crashlytics.logException(ex)
+            }
         }
 
         viewEye.setOnClickListener {
@@ -112,47 +130,22 @@ class MyService : Service() {
             }
         }
 
-        windowManager.addView(view, params)
+        windowManager.addView(serviceView, params)
 
         //Configuracion grafica
         try{
-            val chart = view.findViewById<HorizontalBarChart>(R.id.chart)
-            chart.xAxis.position = XAxis.XAxisPosition.TOP_INSIDE
-            chart.xAxis.granularity = 1f
-            chart.xAxis.setDrawGridLines(false)
-            chart.xAxis.textColor = ContextCompat.getColor(this, R.color.colorAccent)
-
-            chart.axisLeft.setDrawGridLines(false)
-            chart.axisRight.setDrawGridLines(false)
-            chart.axisRight.setDrawLabels(false)
-
-            chart.legend.isEnabled = false
-            chart.description.text = ""
-            chart.description.isEnabled = false
-            chart.setNoDataText("SIN DATOS PARA MOSTRAR")
-            chart.setDrawValueAboveBar(true)
-            chart.setFitBars(true)
-            chart.setTouchEnabled(false)
-            chart.setPinchZoom(false)
-
-            //Sample data
-            setSampleChartData(chart)
-
             mSocket = IO.socket("http://chispitas.sytes.net")
             mSocket.on(Socket.EVENT_CONNECT) {
-                Log.d("XXXXXXX", "EVENT_CONNECT")
                 runOnUiThread(Runnable {
                     viewStatus.setImageResource(R.drawable.server_on)
                     serverStatus.setText(R.string.SERVER_ON)
                 })
             }.on(Socket.EVENT_DISCONNECT){
-                Log.d("XXXXXXX", "EVENT_DISCONNECT")
                 runOnUiThread(Runnable {
                     viewStatus.setImageResource(R.drawable.server_off)
                     serverStatus.setText(R.string.SERVER_OFF)
                 })
             }.on(Socket.EVENT_RECONNECTING){
-                Log.d("XXXXXXX", "EVENT_RECONNECTING")
                 runOnUiThread(Runnable {
                     viewStatus.setImageResource(R.drawable.server_off)
                     serverStatus.setText(R.string.SERVER_OFF)
@@ -164,7 +157,6 @@ class MyService : Service() {
                     dataGrafica[1] = 0
                     dataGrafica[2] = 0
 
-                    //RESET HEADER
                     for(item in it.iterator()){
                         val mainJSON = JSONObject(item.toString())
 
@@ -177,26 +169,12 @@ class MyService : Service() {
                             viewFirstText.text  = resp.getString(0)
                             viewSecondText.text = resp.getString(1)
                             viewThirdText.text  = resp.getString(2)
-                        })
 
-                        val dataSet = BarDataSet(
-                            listOf(BarEntry(0f, 0f), BarEntry(1f, 0f), BarEntry(2f, 0f)), "1,2,3"
-                        )
-                        dataSet.colors = listOf(
-                            ContextCompat.getColor(this, R.color.FIRST),
-                            ContextCompat.getColor(this, R.color.SECOND),
-                            ContextCompat.getColor(this, R.color.THIRD)
-                        )
-                        chart.data = BarData(dataSet)
-                        chart.xAxis.valueFormatter = IAxisValueFormatter { value, _ ->
-                            resp.getString(
-                                when(value.toInt()){
-                                    0   -> 2
-                                    2   -> 0
-                                    else -> value.toInt()
-                                }
-                            )
-                        }
+                            //CHART PROGRESS VALUES
+                            CHARTA.text = resp.getString(0)
+                            CHARTB.text = resp.getString(1)
+                            CHARTC.text = resp.getString(2)
+                        })
                     }
                 }catch (ex: Exception){
                     Crashlytics.logException(ex)
@@ -204,38 +182,34 @@ class MyService : Service() {
             }.on("Grafica"){
                 try{
                     for(item in it.iterator()){
-                        val mainJSON      = JSONObject(item.toString())
-                        val arrayValores  = mainJSON.getJSONArray("array")
+                        runOnUiThread(Runnable {
+                            val arrayValores  = JSONObject(item.toString()).getJSONArray("array")
+                            dataGrafica[2] += arrayValores.getString(0).toIntOrNull() ?: 0
+                            dataGrafica[1] += arrayValores.getString(1).toIntOrNull() ?: 0
+                            dataGrafica[0] += arrayValores.getString(2).toIntOrNull() ?: 0
 
-                        dataGrafica[2] += arrayValores.getString(0).toIntOrNull() ?: 0
-                        dataGrafica[1] += arrayValores.getString(1).toIntOrNull() ?: 0
-                        dataGrafica[0] += arrayValores.getString(2).toIntOrNull() ?: 0
-                        val total = dataGrafica.sum()
+                            val total = dataGrafica.sum()
 
-                        //CALCULO DE PORCENTAJES
-                        var dataSet = BarDataSet(listOf(
-                            BarEntry(0f, dataGrafica[0].toFloat() / total * 100),
-                            BarEntry(1f, dataGrafica[1].toFloat() / total * 100),
-                            BarEntry(2f, dataGrafica[2].toFloat() / total * 100)), ""
-                        )
-                        dataSet.setDrawValues(false)
-
-                        //VOLTEAR GRAFICA EN CASO DE "NO"
-                        if("\\bNO\\b".toRegex().findAll(viewPregunta.text).count() > 0) {
-                            val A = 100 - (dataGrafica[0].toFloat() / total * 100)
-                            val B = 100 - (dataGrafica[1].toFloat() / total * 100)
-                            val C = 100 - (dataGrafica[2].toFloat() / total * 100)
-
-                            dataSet = BarDataSet(listOf(
-                                BarEntry(0f, A / (A+B+C) * 100 ),
-                                BarEntry(1f, B / (A+B+C) * 100 ),
-                                BarEntry(2f, C / (A+B+C) * 100 )), ""
-                            )
-                        }
-
-                        dataSet.colors = listOf(Color.RED, Color.DKGRAY, Color.GREEN)
-                        chart.data = BarData(dataSet)
-                        chart.invalidate()
+                            //CALCULO DE PORCENTAJES
+                            if(total >= 1){
+                                //VOLTEAR GRAFICA EN CASO DE "NO"
+                                if("\\bNO\\b".toRegex().findAll(viewPregunta.text).count() > 0) {
+                                    val A: Float    = 100 - (dataGrafica[2].toFloat() / total * 100)
+                                    val B: Float    = 100 - (dataGrafica[1].toFloat() / total * 100)
+                                    val C: Float    = 100 - (dataGrafica[0].toFloat() / total * 100)
+                                    val suma: Float = A + B + C
+                                    if(suma >= 1){
+                                        PROGRESSA.progress = (A / suma * 100).toInt()
+                                        PROGRESSB.progress = (B / suma * 100).toInt()
+                                        PROGRESSC.progress = (C / suma * 100).toInt()
+                                    }
+                                }else{
+                                    PROGRESSA.progress = (dataGrafica[2].toFloat() / total * 100).toInt()
+                                    PROGRESSB.progress = (dataGrafica[1].toFloat() / total * 100).toInt()
+                                    PROGRESSC.progress = (dataGrafica[0].toFloat() / total * 100).toInt()
+                                }
+                            }
+                        })
                     }
                 }catch (ex: Exception){
                     Crashlytics.logException(ex)
@@ -257,61 +231,11 @@ class MyService : Service() {
                             }
 
                             val valor: Float = suma / 2f / jsonOption.length()
-
                             runOnUiThread(Runnable {
-                                when(i){
-                                    0 ->  {
-                                        val a: Float = valor.toString().toFloatOrNull() ?: 0f
-                                        val b: Float = viewSecondValue.text.toString().toFloatOrNull() ?: 0f
-                                        val c: Float = viewThirdValue.text.toString().toFloatOrNull() ?: 0f
-
-                                        viewFirstValue.text = ceil(a / (a+b+c) * 100).toInt().toString()
-                                    }
-                                    1 -> {
-                                        val a: Float = viewFirstValue.text.toString().toFloatOrNull()  ?: 0f
-                                        val b: Float = valor.toString().toFloatOrNull() ?: 0f
-                                        val c: Float = viewThirdValue.text.toString().toFloatOrNull() ?: 0f
-
-                                        viewSecondValue.text = ceil(b / (a+b+c) * 100).toInt().toString()
-                                    }
-                                    else ->  {
-                                        val a: Float = viewFirstValue.text.toString().toFloatOrNull()  ?: 0f
-                                        val b: Float = viewSecondValue.text.toString().toFloatOrNull() ?: 0f
-                                        val c: Float = valor.toString().toFloatOrNull()                ?: 0f
-
-                                        viewThirdValue.text = ceil(c / (a+b+c) * 100).toInt().toString()
-                                    }
-                                }
-
-                                val a: Float = viewFirstValue.text.toString().toFloatOrNull() ?: 0f
-                                val b: Float = viewSecondValue.text.toString().toFloatOrNull() ?: 0f
-                                val c: Float = viewThirdValue.text.toString().toFloatOrNull() ?: 0f
-
-                                if(a >= b && a >= c){
-                                    viewFirstValue.setTextColor(ContextCompat.getColor(this, R.color.FIRST))
-                                    viewSecondValue.setTextColor(Color.GRAY)
-                                    viewThirdValue.setTextColor(Color.GRAY)
-
-                                    viewFirstText.setTextColor(ContextCompat.getColor(this, R.color.FIRST))
-                                    viewSecondText.setTextColor(Color.GRAY)
-                                    viewThirdText.setTextColor(Color.GRAY)
-                                }else if(b >= a && b >= c){
-                                    viewFirstValue.setTextColor(Color.GRAY)
-                                    viewSecondValue.setTextColor(ContextCompat.getColor(this, R.color.FIRST))
-                                    viewThirdValue.setTextColor(Color.GRAY)
-
-                                    viewFirstText.setTextColor(Color.GRAY)
-                                    viewSecondText.setTextColor(ContextCompat.getColor(this, R.color.FIRST))
-                                    viewThirdText.setTextColor(Color.GRAY)
-                                }else{
-                                    viewFirstValue.setTextColor(Color.GRAY)
-                                    viewSecondValue.setTextColor(Color.GRAY)
-                                    viewThirdValue.setTextColor(ContextCompat.getColor(this, R.color.FIRST))
-
-                                    viewFirstText.setTextColor(Color.GRAY)
-                                    viewSecondText.setTextColor(Color.GRAY)
-                                    viewThirdText.setTextColor(ContextCompat.getColor(this, R.color.FIRST))
-                                }
+                                // Calcular valores de la tabla
+                                calcularValorTabla(i, valor.toString().toFloatOrNull() ?: 0f)
+                                // Resaltar Tabla
+                                resaltarTabla()
                             })
                             Log.d("XXXXX", "$jsonOption $valor")
                         }
@@ -322,10 +246,19 @@ class MyService : Service() {
             }.on("textoHeader"){
                 try{
                     for (item in it.iterator()){
-                        val mainJSON = JSONObject(item.toString())
-                        val htmlStr  = mainJSON.getString("htmlTextoHeader")
+                        var htmlStr  = JSONObject(item.toString()).getString("htmlTextoHeader")
 
                         if(htmlStr !== "null" && htmlStr !== ""){
+                            // HTML MATCH
+                            htmlStr = CHARTA.text.toString().toRegex(RegexOption.IGNORE_CASE)
+                                .replace(htmlStr, "<span style='color: green; font-size: 25px'>"+CHARTA.text+"</span>")
+
+                            htmlStr = CHARTB.text.toString().toRegex(RegexOption.IGNORE_CASE)
+                                .replace(htmlStr, "<span style='color: black; font-size: 25px'>"+CHARTB.text+"</span>")
+
+                            htmlStr = CHARTC.text.toString().toRegex(RegexOption.IGNORE_CASE)
+                                .replace(htmlStr, "<span style='color: red; font-size: 25px'>"+CHARTC.text+"</span>")
+
                             runOnUiThread(Runnable {
                                 viewGoogleHeader.visibility = View.VISIBLE
                                 viewGoogleHeader.loadData(htmlStr,"text/html", "UTF-8")
@@ -337,7 +270,6 @@ class MyService : Service() {
                 }
             }
 
-            chart.invalidate()
             mSocket.connect()
         }catch (e: Exception){
             Crashlytics.logException(e)
@@ -346,22 +278,32 @@ class MyService : Service() {
         return START_STICKY
     }
 
-    fun setSampleChartData(chart: HorizontalBarChart){
-        val data = BarDataSet( listOf(BarEntry(0f, 10f), BarEntry(1f, 40f), BarEntry(2f, 20f)), "1,2,3"  )
-        data.setDrawValues(false)
-        data.colors = listOf(
-            ContextCompat.getColor(this, R.color.FIRST),
-            ContextCompat.getColor(this, R.color.SECOND),
-            ContextCompat.getColor(this, R.color.THIRD)
-        )
-        chart.data = BarData(data)
-        chart.xAxis.valueFormatter = IAxisValueFormatter { value, _ ->
-            when(value.toInt()){
-                0   -> "Unos Calzoncillos"
-                2   -> "Una papa"
-                else -> "Disco de oro"
+    fun resaltarTabla(){
+        val position = arrayValoresTabla.indexOf(arrayValoresTabla.maxBy { it.text.toString().toFloatOrNull() ?: 0F })
+        arrayTextoTabla.forEachIndexed { index, _ ->
+            arrayTextoTabla  [index].setTextColor( if(position == index) colorVerde else colorGris )
+            arrayValoresTabla[index].setTextColor( if(position == index) colorVerde else colorGris )
+        }
+    }
+
+    fun calcularValorTabla(position: Int, valor: Float){
+        val arrayValores : Array<Float> = Array(arrayValoresTabla.size){ 0F }
+        arrayValoresTabla.forEachIndexed { index, _ ->
+            arrayValores[index] = if (position == index) {
+                valor
+            } else {
+                arrayValoresTabla[index].text.toString().toFloatOrNull() ?: 0F
             }
         }
+
+        //VOLTEAR valores EN CASO DE "NO" en pregunta
+        if("\\bNO\\b".toRegex().findAll(serviceView.findViewById<TextView>(R.id.pregunta).text).count() > 0) {
+            arrayValores[0] = arrayValores.sum() - arrayValores[0]
+            arrayValores[1] = arrayValores.sum() - arrayValores[1]
+            arrayValores[2] = arrayValores.sum() - arrayValores[2]
+        }
+
+        arrayValoresTabla[position].text = ceil(arrayValores[position] / arrayValores.sum() * 100).toInt().toString()
     }
 
     fun runOnUiThread(runnable: Runnable) {
