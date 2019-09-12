@@ -9,6 +9,9 @@ import android.view.Menu
 import android.view.MenuItem
 import com.google.android.gms.ads.MobileAds
 import android.content.Intent
+import android.util.Log
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
     val TAB_TITLES = arrayOf( R.string.tab_text_1, R.string.tab_text_2 )
@@ -18,6 +21,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.my_toolbar))
         MobileAds.initialize(this, "ca-app-pub-5846226462716541~1162981272")
+
+        Log.d("XXXX", FirebaseAuth.getInstance().currentUser?.uid ?: "")
 
         // Viewpager
         view_pager.adapter = object : FragmentPagerAdapter(supportFragmentManager) {

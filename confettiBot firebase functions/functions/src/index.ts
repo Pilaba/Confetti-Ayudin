@@ -28,3 +28,23 @@ export const onvideoWatched = functions.https.onCall((data, context) => {
         throw new functions.https.HttpsError('aborted', `Error actualizando datos de usuario ${userID}`);
     })
 }) 
+
+export const resetWatchedVideo = functions.https.onRequest((req, res) => {
+    return admin.database().ref(`/users`).once("value").then(snapshot => {
+        
+        snapshot.forEach(user => {
+            admin.database().ref(`/users/${user.key}`).update({
+                'watchVideo': false
+            })
+        })
+        res.status(200).send("OK");
+    }).catch(err => {
+        console.log(err);
+        res.status(400).json(err);
+    })
+})
+
+
+
+
+

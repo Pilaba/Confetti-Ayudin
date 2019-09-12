@@ -7,13 +7,9 @@ import android.app.NotificationChannel
 import android.content.Context
 import android.graphics.*
 import android.os.*
-import android.util.Log
 import android.view.*
 import android.webkit.WebView
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.crashlytics.android.Crashlytics
@@ -28,11 +24,13 @@ class MyService : Service() {
     lateinit var mSocket     : Socket
     lateinit var handler     : Handler
     lateinit var serviceView : View
+    lateinit var templateError: LinearLayout
     val dataGrafica = arrayOf(0,0,0)
     lateinit var arrayTextoTabla   : Array<TextView>
     lateinit var arrayValoresTabla : Array<TextView>
     var colorVerde                 : Int = 0x0B6623
     var colorGris                  : Int = 0xAAAAAA
+    var banderaNaN                 : Boolean = false
 
     override fun onCreate() {
         super.onCreate()
@@ -56,6 +54,7 @@ class MyService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        banderaNaN = false
         //Create floating widget
         val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
@@ -69,7 +68,7 @@ class MyService : Service() {
             params.type = WindowManager.LayoutParams.TYPE_PHONE;
         }
 
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_SECURE
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         params.format = PixelFormat.TRANSLUCENT
         params.gravity = Gravity.TOP
 
@@ -84,6 +83,7 @@ class MyService : Service() {
         val serverStatus = serviceView.findViewById<TextView>(R.id.SERVER_STATUS)
         val viewTabla    = serviceView.findViewById<LinearLayout>(R.id.tabla)
         val viewGoogleHeader = serviceView.findViewById<WebView>(R.id.googleHeader)
+        templateError    = serviceView.findViewById<LinearLayout>(R.id.templateError)
 
         val viewFirstText   = serviceView.findViewById<TextView>(R.id.firstTEXT)
         val viewFirstValue  = serviceView.findViewById<TextView>(R.id.firstVALUE)
@@ -134,7 +134,7 @@ class MyService : Service() {
 
         //Configuracion grafica
         try{
-            mSocket = IO.socket("http://chispitas.sytes.net")
+            mSocket = IO.socket("http://192.168.0.15")
             mSocket.on(Socket.EVENT_CONNECT) {
                 runOnUiThread(Runnable {
                     viewStatus.setImageResource(R.drawable.server_on)
@@ -157,113 +157,91 @@ class MyService : Service() {
                     dataGrafica[1] = 0
                     dataGrafica[2] = 0
 
-                    for(item in it.iterator()){
-                        val mainJSON = JSONObject(item.toString())
+                    val mainJSON = JSONObject(it.iterator().next().toString())
 
-                        val preg = mainJSON.getString("P")               // Pregunta
-                        val resp: JSONArray = mainJSON.getJSONArray("R") // Respuestas
+                    val preg = mainJSON.getString("P")               // Pregunta
+                    val resp: JSONArray = mainJSON.getJSONArray("R") // Respuestas
 
-                        runOnUiThread (Runnable {
-                            viewGoogleHeader.visibility = View.GONE
-                            viewPregunta.text   = preg
-                            viewFirstText.text  = resp.getString(0)
-                            viewSecondText.text = resp.getString(1)
-                            viewThirdText.text  = resp.getString(2)
+                    banderaNaN = resp.getString(0).equals("NaN", ignoreCase = true) or
+                                resp.getString(1).equals("NaN", ignoreCase = true) or
+                                resp.getString(2).equals("NaN", ignoreCase = true)
 
-                            //CHART PROGRESS VALUES
-                            CHARTA.text = resp.getString(0)
-                            CHARTB.text = resp.getString(1)
-                            CHARTC.text = resp.getString(2)
-                        })
-                    }
+                    runOnUiThread (Runnable {
+                        viewGoogleHeader.visibility = View.GONE
+                        viewPregunta.text   = preg
+                        viewFirstText.text  = resp.getString(0)
+                        viewSecondText.text = resp.getString(1)
+                        viewThirdText.text  = resp.getString(2)
+
+                        //CHART PROGRESS VALUES
+                        CHARTA.text = resp.getString(0)
+                        CHARTB.text = resp.getString(1)
+                        CHARTC.text = resp.getString(2)
+                    })
                 }catch (ex: Exception){
                     Crashlytics.logException(ex)
                 }
             }.on("Grafica"){
                 try{
-                    for(item in it.iterator()){
-                        runOnUiThread(Runnable {
-                            val arrayValores  = JSONObject(item.toString()).getJSONArray("array")
-                            dataGrafica[2] += arrayValores.getString(0).toIntOrNull() ?: 0
-                            dataGrafica[1] += arrayValores.getString(1).toIntOrNull() ?: 0
-                            dataGrafica[0] += arrayValores.getString(2).toIntOrNull() ?: 0
+                    runOnUiThread(Runnable {
+                        val arrayValores  = JSONObject(it.iterator().next().toString()).getJSONArray("array")
+                        dataGrafica[2] += arrayValores.getString(0).toIntOrNull() ?: 0
+                        dataGrafica[1] += arrayValores.getString(1).toIntOrNull() ?: 0
+                        dataGrafica[0] += arrayValores.getString(2).toIntOrNull() ?: 0
 
-                            val total = dataGrafica.sum()
+                        val total = dataGrafica.sum()
 
-                            //CALCULO DE PORCENTAJES
-                            if(total >= 1){
-                                //VOLTEAR GRAFICA EN CASO DE "NO"
-                                if("\\bNO\\b".toRegex().findAll(viewPregunta.text).count() > 0) {
-                                    val A: Float    = 100 - (dataGrafica[2].toFloat() / total * 100)
-                                    val B: Float    = 100 - (dataGrafica[1].toFloat() / total * 100)
-                                    val C: Float    = 100 - (dataGrafica[0].toFloat() / total * 100)
-                                    val suma: Float = A + B + C
-                                    if(suma >= 1){
-                                        PROGRESSA.progress = (A / suma * 100).toInt()
-                                        PROGRESSB.progress = (B / suma * 100).toInt()
-                                        PROGRESSC.progress = (C / suma * 100).toInt()
-                                    }
-                                }else{
-                                    PROGRESSA.progress = (dataGrafica[2].toFloat() / total * 100).toInt()
-                                    PROGRESSB.progress = (dataGrafica[1].toFloat() / total * 100).toInt()
-                                    PROGRESSC.progress = (dataGrafica[0].toFloat() / total * 100).toInt()
+                        //CALCULO DE PORCENTAJES
+                        if(total >= 1){
+                            //VOLTEAR GRAFICA EN CASO DE "NO"
+                            if("\\bNO\\b".toRegex().findAll(viewPregunta.text).count() > 0) {
+                                val A: Float    = 100 - (dataGrafica[2].toFloat() / total * 100)
+                                val B: Float    = 100 - (dataGrafica[1].toFloat() / total * 100)
+                                val C: Float    = 100 - (dataGrafica[0].toFloat() / total * 100)
+                                val suma: Float = A + B + C
+                                if(suma >= 1){
+                                    PROGRESSA.progress = (A / suma * 100).toInt()
+                                    PROGRESSB.progress = (B / suma * 100).toInt()
+                                    PROGRESSC.progress = (C / suma * 100).toInt()
                                 }
+                            }else{
+                                PROGRESSA.progress = (dataGrafica[2].toFloat() / total * 100).toInt()
+                                PROGRESSB.progress = (dataGrafica[1].toFloat() / total * 100).toInt()
+                                PROGRESSC.progress = (dataGrafica[0].toFloat() / total * 100).toInt()
                             }
-                        })
-                    }
+                        }
+                    })
                 }catch (ex: Exception){
                     Crashlytics.logException(ex)
                 }
-            }.on("EachWordSeach"){
+            }.on("EachWordSearchMovil"){
                 try{
-                    for (item in it.iterator()){
-                        val arrayEachWord = JSONObject(item.toString()).getJSONArray("matriz")
-
-                        for (i in 0 until arrayEachWord.length()) {
-                            val jsonOption = arrayEachWord.getJSONArray(i)
-                            var suma = 0
-
-                            for (j in 0 until jsonOption.length()){
-                                val jsonEach = jsonOption.getJSONObject(j)
-                                for (k in 0 until jsonEach.length()){
-                                    suma +=  jsonEach.getString("count").toIntOrNull() ?: 0
-                                }
-                            }
-
-                            val valor: Float = suma / 2f / jsonOption.length()
-                            runOnUiThread(Runnable {
-                                // Calcular valores de la tabla
-                                calcularValorTabla(i, valor.toString().toFloatOrNull() ?: 0f)
-                                // Resaltar Tabla
-                                resaltarTabla()
-                            })
-                            Log.d("XXXXX", "$jsonOption $valor")
-                        }
-                    }
+                    runOnUiThread(Runnable {
+                        val arrayEachWord = JSONObject(it.iterator().next().toString()).getJSONArray("array")
+                        calcularResaltarTabla(arrayEachWord)
+                    })
                 }catch (e: Exception){
                     Crashlytics.logException(e)
                 }
             }.on("textoHeader"){
                 try{
-                    for (item in it.iterator()){
-                        var htmlStr  = JSONObject(item.toString()).getString("htmlTextoHeader")
+                    var htmlStr  = JSONObject(it.iterator().next().toString()).getString("htmlTextoHeader")
 
-                        if(htmlStr !== "null" && htmlStr !== ""){
-                            // HTML MATCH
-                            htmlStr = CHARTA.text.toString().toRegex(RegexOption.IGNORE_CASE)
-                                .replace(htmlStr, "<span style='color: green; font-size: 25px'>"+CHARTA.text+"</span>")
+                    if(htmlStr !== "null" && htmlStr !== ""){
+                        // HTML MATCH
+                        htmlStr = CHARTA.text.toString().toRegex(RegexOption.IGNORE_CASE)
+                            .replace(htmlStr, "<span style='color: green; font-size: 25px'>"+CHARTA.text+"</span>")
 
-                            htmlStr = CHARTB.text.toString().toRegex(RegexOption.IGNORE_CASE)
-                                .replace(htmlStr, "<span style='color: black; font-size: 25px'>"+CHARTB.text+"</span>")
+                        htmlStr = CHARTB.text.toString().toRegex(RegexOption.IGNORE_CASE)
+                            .replace(htmlStr, "<span style='color: black; font-size: 25px'>"+CHARTB.text+"</span>")
 
-                            htmlStr = CHARTC.text.toString().toRegex(RegexOption.IGNORE_CASE)
-                                .replace(htmlStr, "<span style='color: red; font-size: 25px'>"+CHARTC.text+"</span>")
+                        htmlStr = CHARTC.text.toString().toRegex(RegexOption.IGNORE_CASE)
+                            .replace(htmlStr, "<span style='color: red; font-size: 25px'>"+CHARTC.text+"</span>")
 
-                            runOnUiThread(Runnable {
-                                viewGoogleHeader.visibility = View.VISIBLE
-                                viewGoogleHeader.loadData(htmlStr,"text/html", "UTF-8")
-                            })
-                        }
+                        runOnUiThread(Runnable {
+                            viewGoogleHeader.visibility = View.VISIBLE
+                            viewGoogleHeader.loadData(htmlStr,"text/html", "UTF-8")
+                        })
                     }
                 }catch (e: Exception){
                     Crashlytics.logException(e)
@@ -278,32 +256,31 @@ class MyService : Service() {
         return START_STICKY
     }
 
-    fun resaltarTabla(){
+    fun calcularResaltarTabla(array: JSONArray){
+        val arrayValores : Array<Float> = Array(arrayValoresTabla.size){i ->
+            array.getString(i).toFloatOrNull() ?: 0F
+        }
+
+        var suma = arrayValores.sum()
+
+        //VOLTEAR valores EN CASO DE "NO" en pregunta
+        if("\\bNO\\b".toRegex().findAll(serviceView.findViewById<TextView>(R.id.pregunta).text).count() > 0) {
+            arrayValores[0] = suma - arrayValores[0]
+            arrayValores[1] = suma - arrayValores[1]
+            arrayValores[2] = suma - arrayValores[2]
+            suma = arrayValores.sum()
+        }
+
+        arrayValoresTabla.forEachIndexed { index, textView ->
+            textView.text = ceil(arrayValores[index] / suma * 100).toInt().toString()
+        }
+
+        //Resaltar tabla
         val position = arrayValoresTabla.indexOf(arrayValoresTabla.maxBy { it.text.toString().toFloatOrNull() ?: 0F })
         arrayTextoTabla.forEachIndexed { index, _ ->
             arrayTextoTabla  [index].setTextColor( if(position == index) colorVerde else colorGris )
             arrayValoresTabla[index].setTextColor( if(position == index) colorVerde else colorGris )
         }
-    }
-
-    fun calcularValorTabla(position: Int, valor: Float){
-        val arrayValores : Array<Float> = Array(arrayValoresTabla.size){ 0F }
-        arrayValoresTabla.forEachIndexed { index, _ ->
-            arrayValores[index] = if (position == index) {
-                valor
-            } else {
-                arrayValoresTabla[index].text.toString().toFloatOrNull() ?: 0F
-            }
-        }
-
-        //VOLTEAR valores EN CASO DE "NO" en pregunta
-        if("\\bNO\\b".toRegex().findAll(serviceView.findViewById<TextView>(R.id.pregunta).text).count() > 0) {
-            arrayValores[0] = arrayValores.sum() - arrayValores[0]
-            arrayValores[1] = arrayValores.sum() - arrayValores[1]
-            arrayValores[2] = arrayValores.sum() - arrayValores[2]
-        }
-
-        arrayValoresTabla[position].text = ceil(arrayValores[position] / arrayValores.sum() * 100).toInt().toString()
     }
 
     fun runOnUiThread(runnable: Runnable) {
