@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import br.com.simplepass.loadingbutton.customViews.CircularProgressButton
 import com.bumptech.glide.Glide
@@ -81,6 +82,16 @@ class BOTFragment : Fragment(), RewardedVideoAdListener {
                 startService()
             }
         }
+
+        // Mensaje desde firebase
+        val textViewMsj: TextView = view.findViewById(R.id.mensaje)
+        val dbMsj: DatabaseReference = FirebaseDatabase.getInstance().getReference("msj")
+        dbMsj.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                textViewMsj.text = dataSnapshot.value.toString()
+            }
+            override fun onCancelled(error: DatabaseError) { }
+        })
 
         val mAdView = view.findViewById<AdView>(R.id.adView)
         mAdView.loadAd(AdRequest.Builder().build())

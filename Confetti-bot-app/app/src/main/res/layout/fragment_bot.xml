@@ -99,10 +99,14 @@
             app:spinning_bar_color="@color/white"
             app:spinning_bar_padding="6dp" />
 
-        <View android:layout_weight="1"
-              android:layout_width="match_parent"
-              android:background="@android:color/transparent"
-              android:layout_height="0dp"/>
+        <TextView android:id="@+id/mensaje"
+                  android:layout_weight="1"
+                  android:gravity="center"
+                  android:layout_width="match_parent"
+                  android:textColor="@color/colorPrimary"
+                  android:textSize="20sp"
+                  android:background="@android:color/transparent"
+                  android:layout_height="0dp"/>
 
         <com.google.android.gms.ads.AdView
             android:id="@+id/adView"
