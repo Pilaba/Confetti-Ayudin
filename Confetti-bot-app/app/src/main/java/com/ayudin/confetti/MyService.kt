@@ -7,6 +7,7 @@ import android.app.NotificationChannel
 import android.content.Context
 import android.graphics.*
 import android.os.*
+import android.util.Log
 import android.view.*
 import android.webkit.WebView
 import android.widget.*
@@ -122,11 +123,15 @@ class MyService : Service() {
                 viewPregunta.visibility = View.GONE
                 viewGoogleHeader.visibility = View.GONE
                 viewTabla.visibility = View.GONE
+                templateError.visibility = View.GONE
             }else{
                 viewEye.setImageResource(R.drawable.eye_close)
                 viewChart.visibility = View.VISIBLE
                 viewPregunta.visibility = View.VISIBLE
                 viewTabla.visibility = View.VISIBLE
+                if(banderaNaN){
+                    templateError.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -134,7 +139,7 @@ class MyService : Service() {
 
         //Configuracion grafica
         try{
-            mSocket = IO.socket("http://192.168.0.16")
+            mSocket = IO.socket("http://chispitas.sytes.net")
             mSocket.on(Socket.EVENT_CONNECT) {
                 runOnUiThread(Runnable {
                     viewStatus.setImageResource(R.drawable.server_on)
@@ -213,7 +218,7 @@ class MyService : Service() {
                 })
             }.on("textoHeader"){
                 var htmlStr  = JSONObject(it.iterator().next().toString()).getString("htmlTextoHeader")
-
+                Log.d("XXXX", htmlStr)
                 if(htmlStr !== "null" && htmlStr !== ""){
                     // HTML MATCH
                     htmlStr = CHARTA.text.toString().toRegex(RegexOption.IGNORE_CASE)
@@ -225,9 +230,10 @@ class MyService : Service() {
                     htmlStr = CHARTC.text.toString().toRegex(RegexOption.IGNORE_CASE)
                         .replace(htmlStr, "<span style='color: red; font-size: 25px'>"+CHARTC.text+"</span>")
 
+                    Log.d("XXXX", htmlStr)
                     runOnUiThread(Runnable {
                         viewGoogleHeader.visibility = View.VISIBLE
-                        viewGoogleHeader.loadData(htmlStr,"text/html", "UTF-8")
+                        viewGoogleHeader.loadDataWithBaseURL(null, htmlStr,"text/html", "UTF-8", null)
                     })
                 }
             }
@@ -271,12 +277,17 @@ class MyService : Service() {
     fun runOnUiThread(runnable: Runnable) {
         try{
             if(banderaNaN){
-                templateError.visibility = View.VISIBLE
+                handler.post {
+                    templateError.visibility = View.VISIBLE
+                }
             }else{
-                templateError.visibility = View.GONE
+                handler.post {
+                    templateError.visibility = View.GONE
+                }
                 handler.post(runnable)
             }
         }catch (e: Exception){
+            Log.d("xxxx", "dsadas")
             Crashlytics.logException(e)
         }
     }

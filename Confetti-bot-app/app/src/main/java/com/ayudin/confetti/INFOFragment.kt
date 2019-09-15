@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.Button
+import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class INFOFragment : Fragment() {
@@ -21,13 +22,17 @@ class INFOFragment : Fragment() {
         view.findViewById<Button>(R.id.terminos).setOnClickListener {
             if(!modalInfo.isAdded){
                 modalInfo.modalType = MODALTYPE.TERMINOS
-                modalInfo.show(this.fragmentManager,"INFO_TERMINOS_CONDICIONES");
+                fragmentManager?.let {
+                    modalInfo.show(it,"INFO_TERMINOS_CONDICIONES");
+                }
             }
         }
         view.findViewById<Button>(R.id.politicas).setOnClickListener {
             if(!modalInfo.isAdded){
                 modalInfo.modalType = MODALTYPE.POLITICAS
-                modalInfo.show(this.fragmentManager,"INFO_TERMINOS_CONDICIONES");
+                fragmentManager?.let {
+                    modalInfo.show(it,"INFO_TERMINOS_CONDICIONES");
+                }
             }
         }
 
