@@ -140,83 +140,14 @@
             app:layout_constraintBottom_toBottomOf="@+id/imageStatus"
             app:layout_constraintStart_toEndOf="@+id/imageStatus" android:layout_marginStart="8dp"/>
 
-    <LinearLayout android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/chart"
-            app:layout_constraintStart_toStartOf="parent"
-            android:baselineAligned="false"
-            app:layout_constraintEnd_toEndOf="parent" android:id="@+id/tabla">
-
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_weight="1"
-                      android:layout_height="wrap_content"
-                      android:orientation="vertical">
-            <TextView android:text="Una papa"
-                      android:id="@+id/firstTEXT"
-                      android:gravity="center"
-                      android:layout_marginEnd="4dp"
-                      android:layout_marginStart="4dp"
-                      android:textColor="@color/grey"
-                      android:ellipsize="end"
-                      android:maxLines="1"
-                      android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <TextView android:text="30"
-                      android:id="@+id/firstVALUE"
-                      android:textColor="@color/grey"
-                      android:gravity="center"
-                      android:layout_width="match_parent" android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:orientation="vertical">
-            <TextView android:text="Un disco de oro"
-                      android:id="@+id/secondTEXT"
-                      android:layout_marginStart="4dp"
-                      android:layout_marginEnd="4dp"
-                      android:gravity="center"
-                      android:textColor="@color/FIRST"
-                      android:ellipsize="end"
-                      android:maxLines="1"
-                      android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <TextView android:text="60"
-                      android:id="@+id/secondVALUE"
-                      android:textColor="@color/FIRST"
-                      android:gravity="center"
-                      android:layout_width="match_parent" android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:orientation="vertical">
-            <TextView android:text="Unos calzoncillos"
-                      android:id="@+id/thirdTEXT"
-                      android:layout_marginStart="4dp"
-                      android:layout_marginEnd="4dp"
-                      android:gravity="center"
-                      android:textColor="@color/grey"
-                      android:ellipsize="end"
-                      android:maxLines="1"
-                      android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            <TextView android:text="10"
-                      android:id="@+id/thirdVALUE"
-                      android:gravity="center"
-                      android:textColor="@color/grey"
-                      android:layout_width="match_parent" android:layout_height="wrap_content"/>
-        </LinearLayout>
-    </LinearLayout>
-
     <WebView android:id="@+id/googleHeader"
              android:visibility="gone"
              android:layout_width="0dp"
-             android:layout_height="110dp"
+             android:layout_height="140dp"
              app:layout_constraintEnd_toEndOf="parent"
              app:layout_constraintStart_toStartOf="parent"
              app:layout_constraintHorizontal_bias="0.0"
-             app:layout_constraintTop_toBottomOf="@+id/tabla"/>
+             app:layout_constraintTop_toBottomOf="@+id/chart"/>
 
     <LinearLayout
             android:translationZ="2dp"
@@ -228,7 +159,7 @@
             app:layout_constraintTop_toTopOf="@+id/pregunta"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/tabla"
+            app:layout_constraintBottom_toBottomOf="@+id/chart"
             android:orientation="vertical">
 
         <TextView

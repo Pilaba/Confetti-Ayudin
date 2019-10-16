@@ -19,7 +19,6 @@ import com.github.nkzawa.socketio.client.Socket
 import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.Exception
-import kotlin.math.ceil
 
 class MyService : Service() {
     lateinit var mSocket      : Socket
@@ -27,8 +26,6 @@ class MyService : Service() {
     lateinit var serviceView  : View
     lateinit var templateError: LinearLayout
     val dataGrafica = arrayOf(0,0,0)
-    lateinit var arrayTextoTabla   : Array<TextView>
-    lateinit var arrayValoresTabla : Array<TextView>
     var colorVerde                 : Int = 0x0B6623
     var colorGris                  : Int = 0xAAAAAA
     var banderaNaN                 : Boolean = false
@@ -82,19 +79,8 @@ class MyService : Service() {
         val viewEye      = serviceView.findViewById<ImageView>(R.id.eye)
         val viewStatus   = serviceView.findViewById<ImageView>(R.id.imageStatus)
         val serverStatus = serviceView.findViewById<TextView>(R.id.SERVER_STATUS)
-        val viewTabla    = serviceView.findViewById<LinearLayout>(R.id.tabla)
         val viewGoogleHeader = serviceView.findViewById<WebView>(R.id.googleHeader)
         templateError    = serviceView.findViewById(R.id.templateError)
-
-        val viewFirstText   = serviceView.findViewById<TextView>(R.id.firstTEXT)
-        val viewFirstValue  = serviceView.findViewById<TextView>(R.id.firstVALUE)
-        val viewSecondText  = serviceView.findViewById<TextView>(R.id.secondTEXT)
-        val viewSecondValue = serviceView.findViewById<TextView>(R.id.secondVALUE)
-        val viewThirdText   = serviceView.findViewById<TextView>(R.id.thirdTEXT)
-        val viewThirdValue  = serviceView.findViewById<TextView>(R.id.thirdVALUE)
-
-        arrayTextoTabla = arrayOf (viewFirstText, viewSecondText, viewThirdText )
-        arrayValoresTabla = arrayOf ( viewFirstValue, viewSecondValue, viewThirdValue)
 
         //CHART VALUES PROGRESS BAR
         val CHARTA = serviceView.findViewById<TextView>(R.id.CHARTA)
@@ -122,13 +108,11 @@ class MyService : Service() {
                 viewChart.visibility = View.GONE
                 viewPregunta.visibility = View.GONE
                 viewGoogleHeader.visibility = View.GONE
-                viewTabla.visibility = View.GONE
                 templateError.visibility = View.GONE
             }else{
                 viewEye.setImageResource(R.drawable.eye_close)
                 viewChart.visibility = View.VISIBLE
                 viewPregunta.visibility = View.VISIBLE
-                viewTabla.visibility = View.VISIBLE
                 if(banderaNaN){
                     templateError.visibility = View.VISIBLE
                 }
@@ -173,9 +157,6 @@ class MyService : Service() {
                 runOnUiThread (Runnable {
                     viewGoogleHeader.visibility = View.GONE
                     viewPregunta.text   = preg
-                    viewFirstText.text  = resp.getString(0)
-                    viewSecondText.text = resp.getString(1)
-                    viewThirdText.text  = resp.getString(2)
 
                     //CHART PROGRESS VALUES
                     CHARTA.text = resp.getString(0)
@@ -213,8 +194,32 @@ class MyService : Service() {
                 })
             }.on("EachWordSearchMovil"){
                 runOnUiThread(Runnable {
-                    val arrayEachWord = JSONObject(it.iterator().next().toString()).getJSONArray("array")
-                    calcularResaltarTabla(arrayEachWord)
+                    val arrayValores  = JSONObject(it.iterator().next().toString()).getJSONArray("array")
+                    dataGrafica[2] += arrayValores.getString(0).toIntOrNull() ?: 0
+                    dataGrafica[1] += arrayValores.getString(1).toIntOrNull() ?: 0
+                    dataGrafica[0] += arrayValores.getString(2).toIntOrNull() ?: 0
+
+                    val total = dataGrafica.sum()
+
+                    //CALCULO DE PORCENTAJES
+                    if(total >= 1){
+                        //VOLTEAR GRAFICA EN CASO DE "NO"
+                        if("\\bNO\\b".toRegex().findAll(viewPregunta.text).count() > 0) {
+                            val A: Float    = 100 - (dataGrafica[2].toFloat() / total * 100)
+                            val B: Float    = 100 - (dataGrafica[1].toFloat() / total * 100)
+                            val C: Float    = 100 - (dataGrafica[0].toFloat() / total * 100)
+                            val suma: Float = A + B + C
+                            if(suma >= 1){
+                                PROGRESSA.progress = (A / suma * 100).toInt()
+                                PROGRESSB.progress = (B / suma * 100).toInt()
+                                PROGRESSC.progress = (C / suma * 100).toInt()
+                            }
+                        }else{
+                            PROGRESSA.progress = (dataGrafica[2].toFloat() / total * 100).toInt()
+                            PROGRESSB.progress = (dataGrafica[1].toFloat() / total * 100).toInt()
+                            PROGRESSC.progress = (dataGrafica[0].toFloat() / total * 100).toInt()
+                        }
+                    }
                 })
             }.on("textoHeader"){
                 var htmlStr  = JSONObject(it.iterator().next().toString()).getString("htmlTextoHeader")
@@ -244,34 +249,6 @@ class MyService : Service() {
         }
 
         return START_STICKY
-    }
-
-    fun calcularResaltarTabla(array: JSONArray){
-        val arrayValores : Array<Float> = Array(arrayValoresTabla.size){i ->
-            val x = array.getString(i)
-            array.getString(i).toFloatOrNull() ?: 0F
-        }
-
-        var suma = arrayValores.sum()
-
-        //VOLTEAR valores EN CASO DE "NO" en pregunta
-        if("\\bNO\\b".toRegex().findAll(serviceView.findViewById<TextView>(R.id.pregunta).text).count() > 0) {
-            arrayValores[0] = suma - arrayValores[0]
-            arrayValores[1] = suma - arrayValores[1]
-            arrayValores[2] = suma - arrayValores[2]
-            suma = arrayValores.sum()
-        }
-
-        arrayValoresTabla.forEachIndexed { index, textView ->
-            textView.text = ceil(arrayValores[index] / suma * 100).toInt().toString()
-        }
-
-        //Resaltar tabla
-        val position = arrayValoresTabla.indexOf(arrayValoresTabla.maxBy { it.text.toString().toFloatOrNull() ?: 0F })
-        arrayTextoTabla.forEachIndexed { index, _ ->
-            arrayTextoTabla  [index].setTextColor( if(position == index) colorVerde else colorGris )
-            arrayValoresTabla[index].setTextColor( if(position == index) colorVerde else colorGris )
-        }
     }
 
     fun runOnUiThread(runnable: Runnable) {

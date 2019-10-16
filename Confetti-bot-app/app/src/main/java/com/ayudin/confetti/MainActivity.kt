@@ -11,6 +11,7 @@ import com.google.android.gms.ads.MobileAds
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
+import androidx.fragment.app.FragmentStatePagerAdapter
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
@@ -25,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("XXXX", FirebaseAuth.getInstance().currentUser?.uid ?: "")
 
         // Viewpager
-        view_pager.adapter = object : FragmentPagerAdapter(supportFragmentManager) {
+        view_pager.adapter = object : FragmentStatePagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             override fun getItem(position: Int): Fragment {
                 return when (position) {
                     0 -> BOTFragment()
